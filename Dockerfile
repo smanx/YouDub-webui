@@ -75,12 +75,12 @@ RUN mkdir -p data workfolder
 
 # Pre-download Demucs model (htdemucs_ft, 4 sub-models ~700 MB total) - 分离人声与背景音
 RUN if [ "$PRE_DOWNLOAD_DEMUCS" = "true" ]; then \
-        python -c 'import torch, os; model_dir = os.path.expanduser("~/.cache/torch/hub/checkpoints"); os.makedirs(model_dir, exist_ok=True); [torch.hub.load_state_dict_from_url(url, model_dir=model_dir, check_hash=False, weights_only=False) for url in ["https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/f7e0c4bc-ba3fe64a.th", "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/d12395a8-e57c48e6.th", "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/92cfc3b6-ef3bcb9c.th", "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/04573f0d-f3cf25b2.th"]]'; \
+        python -c 'import urllib.request, os; model_dir = os.path.expanduser("~/.cache/torch/hub/checkpoints"); os.makedirs(model_dir, exist_ok=True); [urllib.request.urlretrieve(url, os.path.join(model_dir, url.rsplit("/", 1)[-1])) for url in ["https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/f7e0c4bc-ba3fe64a.th", "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/d12395a8-e57c48e6.th", "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/92cfc3b6-ef3bcb9c.th", "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/04573f0d-f3cf25b2.th"]]'; \
     fi
 
 # Pre-download Whisper model (large-v3-turbo, ~3 GB) - 语音识别
 RUN if [ "$PRE_DOWNLOAD_WHISPER" = "true" ]; then \
-        python -c 'import whisper; whisper._download(whisper._MODELS["large-v3-turbo"], "/root/.cache/whisper")'; \
+        python -c 'import whisper; whisper._download(whisper._MODELS["large-v3-turbo"], "/root/.cache/whisper", False)'; \
     fi
 
 # Pre-download VoxCPM2 model (~several GB) - 生成配音
